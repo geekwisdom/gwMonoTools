@@ -109,3 +109,4 @@
 /home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/example.properties
 /home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/log4net.dll
 /home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/log4net.xml
+/home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/gwUnitTests.exe.config

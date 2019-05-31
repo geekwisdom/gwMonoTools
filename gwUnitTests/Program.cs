@@ -12,7 +12,8 @@ namespace gwUnitTests
         {
             //  LogUnitTest();
             //TestData2();
-            TestSettings();
+            // TestSettings();
+            LogUnitTest();
             Console.ReadLine();
         }
 
