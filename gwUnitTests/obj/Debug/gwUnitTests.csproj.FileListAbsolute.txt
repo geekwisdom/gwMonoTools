@@ -107,3 +107,5 @@
 /home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/Program.cs
 /home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/testnet.config
 /home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/example.properties
+/home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/log4net.dll
+/home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/log4net.xml
