@@ -1,18 +1,36 @@
-﻿using System;
+﻿/**************************************************************************************
+' Script Name: GWDataTable.cs
+' **************************************************************************************
+' @(#)    Purpose:
+' @(#)    This is a shared component available to all .NET (C#) applications. It allows a common 
+' @(#)    data row / data table object that for manipulating sets of related data abstractly.
+' @(#)    Regardless of the specific architecture (database, files, xml, json used)
+' **************************************************************************************
+'  Written By: Brad Detchevery
+' Created:     2019-05-29 - Initial Architecture
+' 
+' **************************************************************************************
+'Note: Changing this routine effects all programs that manipulate data sets
+'-------------------------------------------------------------------------------*/
+
+using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.IO;
+using System.Reflection;
+using System.Linq;
 
-namespace org.geekwisdom.data
+namespace org.geekwisdom
 {
     public class GWDataTable
     {
-        private List<GWDataRow> data = new List<GWDataRow>();
+        private List<GWRowInterface> data = new List<GWRowInterface>();
         string xml = "";
-        String tablename = "table1";
+        string tablename = "table1";
+        string defObject = "org.geekwisdom.GWDataRow";
         private Dictionary<String, String> parsedMap = new Dictionary<String, String>();
 
         public GWDataTable()
@@ -20,16 +38,29 @@ namespace org.geekwisdom.data
 
         }
 
-        public GWDataTable(String xmlinfo, String TableName)
+        public GWDataTable(string xmlinfo, string TableName, string _defObject)
+        {
+            xml = xmlinfo;
+            if (TableName == "") tablename = "root";
+            else tablename = TableName;
+            defObject = _defObject;
+        }
+
+        public GWDataTable(string xmlinfo, string TableName)
         {
             xml = xmlinfo;
             if (TableName == "") tablename = "root";
             else tablename = TableName;
         }
 
-        public GWDataTable find(String whereclause)
+        public GWDataTable find(string whereclause)
         {
-            String xmldata = toXml();
+            return find(whereclause, defObject);
+        }
+
+        public GWDataTable find(string whereclause,string _defObj)
+        {
+            string xmldata = toXml();
             //System.out.println(xmldata);
             GWDataTable retTable = new GWDataTable("", tablename);
             try
@@ -37,7 +68,7 @@ namespace org.geekwisdom.data
 
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(xmldata);
-                String qry = "//xmlDS/" + tablename + "[" + whereclause + "]";
+                string qry = "//xmlDS/" + tablename + "[" + whereclause + "]";
                 XmlNodeList nodes = doc.DocumentElement.SelectNodes(qry);
 
                 //System.out.println("Length is: " + nodes.getLength());
@@ -51,12 +82,31 @@ namespace org.geekwisdom.data
                     {
                         //thechild.Name;
                         //thechild.InnerText;
-                        theitem.Add(thechild.Name, thechild.InnerText);
+                        theitem.Add(tablename + "." + thechild.Name, thechild.InnerText);
                     }
                     if (theitem.Count > 0)
                     {
-                        GWDataRow therow = new GWDataRow(theitem);
-                        retTable.Add(therow);
+
+                        Type type = Type.GetType(_defObj);
+                        if (type == null)
+                        {
+                            System.Reflection.Assembly currentAssem = System.Reflection.Assembly.GetEntryAssembly();
+                            Type CorrectType = null;
+                            foreach (Type t1 in currentAssem.GetTypes())
+                            {
+                                if (t1.Name == _defObj)
+                                    CorrectType = t1;
+
+                            }
+                            type = CorrectType;
+
+                        }
+                        if (type != null)
+                        {
+                             
+                            GWRowInterface therow = (GWRowInterface) Activator.CreateInstance(type,theitem);
+                            retTable.Add(therow);
+                        }
                     }
                 }
             }
@@ -64,30 +114,30 @@ namespace org.geekwisdom.data
             return retTable;
         }
 
-        public void loadXml(String xmlstring)
+        public void loadXml(string xmlstring)
         {
             //read xml file add to array
             ReadXml(xmlstring);
         }
 
-        private void ReadXml(String XMLInput)
+        private void ReadXml(string XMLInput)
         {
-            String XMLString = XMLInput.Replace("&", "%26");
-            //    XMLString =XMLString.replaceAll( "(<\\?[^<]*\\?>)?", "");
-            if (XMLString.IndexOf("<soap:") > 0)
+            string XMLstring = XMLInput.Replace("&", "%26");
+            //    XMLstring =XMLString.replaceAll( "(<\\?[^<]*\\?>)?", "");
+            if (XMLstring.IndexOf("<soap:") > 0)
                 {
                 XmlDocument xmlDocument = new XmlDocument();
-                xmlDocument.LoadXml(XMLString);
+                xmlDocument.LoadXml(XMLstring);
 
                 var soapBody = xmlDocument.GetElementsByTagName("soap:Body")[0];
-                XMLString = soapBody.InnerXml;
+                XMLstring = soapBody.InnerXml;
             }
             //  System.out.println(XMLString);
             XmlDocument doc = new XmlDocument();
 
             try
             {
-                doc.LoadXml(XMLString);
+                doc.LoadXml(XMLstring);
             }
             catch (Exception e)
             {
@@ -95,16 +145,17 @@ namespace org.geekwisdom.data
                 throw e;
             }
             XmlElement root = doc.DocumentElement;
-            tablename = root.Name;
+            XmlNode firstchild = root.FirstChild.NextSibling;
+            tablename = firstchild.Name;
             GWDataRow newrow = new GWDataRow(readnode(root, "", ""));
             data.Add(newrow);
 
             // data.add(item);
         }
 
-        private Dictionary<String, String> readnode(XmlNode node, String buildedKey, String lastkey)
+        private Dictionary<String, String> readnode(XmlNode node, string buildedKey, string lastkey)
         {
-            String nodeName = node.Name;
+            string nodeName = node.Name;
             //   int thislength=0;
             bool newone = false;
             if (nodeName.ToLower() != "#text")
@@ -165,12 +216,12 @@ namespace org.geekwisdom.data
             return parsedMap;
         }
 
-        public GWDataRow GetRow(int RowNum)
+        public GWRowInterface GetRow(int RowNum)
         {
             return data[RowNum];
         }
 
-        public void Add(GWDataRow newrow)
+        public void Add(GWRowInterface newrow)
         {
             data.Add(newrow);
         }
@@ -228,7 +279,7 @@ namespace org.geekwisdom.data
         {
             WriteXml(sw, "");
         }
-        public void WriteXml(StringWriter finalsw, String nodename)
+        public void WriteXml(StringWriter finalsw, string nodename)
         {
             int colstart = 0;
             if (nodename == "") nodename = "xmlDS";
@@ -236,7 +287,7 @@ namespace org.geekwisdom.data
             StringWriter sw = new StringWriter();
             for (int i = 0; i < data.Count; i++)
             {
-                GWDataRow col = data[i];
+                GWRowInterface col = data[i];
                 Dictionary<string, string> item = col.ToArray();
                 string header = "";
                 string footer = "";
@@ -245,7 +296,7 @@ namespace org.geekwisdom.data
                foreach (KeyValuePair<string, string> entry in item)
                     {
                     string key = entry.Key;
-                    string value = entry.Value;
+                    string value = entry    .Value;
                     if (value != null)
                     {
                         value = value.ToString().Replace("&", "%26");
@@ -255,7 +306,7 @@ namespace org.geekwisdom.data
                         {
                             for (int j = colstart; j < a.Length - 1; j++)
                             {
-                                String tabs = repeat(" ", j);
+                                string tabs = repeat(" ", j);
                                 if (!(a[j] == nodename )) header = header + tabs + "<" + a[j] + ">\n";
                             }
                         }
@@ -266,7 +317,7 @@ namespace org.geekwisdom.data
                             {
                                 // int count=-1 * j + a.length;
                                 int count = j;
-                                String tabs = repeat(" ", count);
+                                string tabs = repeat(" ", count);
                                 if (!(a[j] == nodename)) footer = footer + tabs + "</" + a[j] + ">\n";
                             }
                         }
