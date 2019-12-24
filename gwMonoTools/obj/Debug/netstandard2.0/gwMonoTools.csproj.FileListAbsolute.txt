@@ -1,9 +1,0 @@
-/home/adminbrad/Projects/gwMonoTools/gwMonoTools/obj/Debug/netstandard2.0/gwMonoTools.csprojAssemblyReference.cache
-/home/adminbrad/Projects/gwMonoTools/gwMonoTools/obj/Debug/netstandard2.0/gwMonoTools.csproj.CoreCompileInputs.cache
-/home/adminbrad/Projects/gwMonoTools/gwMonoTools/obj/Debug/netstandard2.0/gwMonoTools.AssemblyInfoInputs.cache
-/home/adminbrad/Projects/gwMonoTools/gwMonoTools/obj/Debug/netstandard2.0/gwMonoTools.AssemblyInfo.cs
-/home/adminbrad/Projects/gwMonoTools/gwMonoTools/bin/Debug/netstandard2.0/gwMonoTools.deps.json
-/home/adminbrad/Projects/gwMonoTools/gwMonoTools/bin/Debug/netstandard2.0/gwMonoTools.dll
-/home/adminbrad/Projects/gwMonoTools/gwMonoTools/bin/Debug/netstandard2.0/gwMonoTools.pdb
-/home/adminbrad/Projects/gwMonoTools/gwMonoTools/obj/Debug/netstandard2.0/gwMonoTools.dll
-/home/adminbrad/Projects/gwMonoTools/gwMonoTools/obj/Debug/netstandard2.0/gwMonoTools.pdb
