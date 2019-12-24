@@ -58,8 +58,16 @@ namespace org.geekwisdom
             return find(whereclause, defObject);
         }
 
-        public GWDataTable find(string whereclause,string _defObj)
+        public GWDataTable find(string qlwhereclause,string _defObj)
         {
+            GWQL xPathTester = new GWQL(qlwhereclause);
+            GWQLXPathBuilder myxpath = new GWQLXPathBuilder();
+            string whereclause = "";
+            try
+            {
+                whereclause = xPathTester.getCommand(myxpath);
+            }
+            catch (GWException e) { throw e; }
             string xmldata = toXml();
             //System.out.println(xmldata);
             GWDataTable retTable = new GWDataTable("", tablename);

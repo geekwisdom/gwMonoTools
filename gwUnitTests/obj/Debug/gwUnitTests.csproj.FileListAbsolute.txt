@@ -110,3 +110,5 @@
 /home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/log4net.dll
 /home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/log4net.xml
 /home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/gwUnitTests.exe.config
+/home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/Newtonsoft.Json.dll
+/home/adminbrad/Projects/gwMonoTools/gwUnitTests/bin/Debug/Newtonsoft.Json.xml
