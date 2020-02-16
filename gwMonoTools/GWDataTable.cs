@@ -22,6 +22,7 @@ using System.Xml.Linq;
 using System.IO;
 using System.Reflection;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace org.geekwisdom
 {
@@ -277,6 +278,52 @@ namespace org.geekwisdom
             
             data.RemoveAt(rownum);
         }
+
+        public string toJSON()
+        {
+
+        List<Dictionary<String, String>> jsonData = new List<Dictionary<String,String>>();
+            for (int i=0;i<data.Count;i++)
+            {
+                Dictionary<String, String> item = data[i].ToRawArray();
+                Dictionary<String, String> newitem = new Dictionary<string, string>();
+                foreach (var entry in item)
+                {
+                    string Value = entry.Value;
+                    string key = entry.Key;
+                    string truekey = key;
+                    if (key.IndexOf(".") >=0)
+                    {
+                        string [] parts = key.Split('.');
+                        
+                        string TableNameTest = parts[0];
+                        if (this.tablename != TableNameTest) TableNameTest = parts[1];
+                        if (this.tablename == TableNameTest)
+                        {
+                            truekey = parts[parts.Length-1];
+                            if (Value != null)
+                                Value = Value.Replace("&", "&26");
+                            newitem.Add(truekey, Value);
+                        }
+                        else
+                        {
+                            newitem.Add(truekey, null);
+                        }
+
+                        }
+                    }
+
+                jsonData.Add(newitem);
+            }
+
+
+            Dictionary<string, object> root = new Dictionary<string, object>();
+            root.Add(tablename, jsonData);
+            string json = JsonConvert.SerializeObject(root, Newtonsoft.Json.Formatting.None);
+            
+            return json;
+        }
+
         public string toXml()
         {
             System.IO.StringWriter retval = new StringWriter();

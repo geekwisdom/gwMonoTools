@@ -26,7 +26,12 @@ public GWDataRow(Dictionary<string,string> i)
         dataItem = i;
     }
 
-    public void Set (string key,string value)
+        public GWDataRow()
+        {
+            dataItem = new Dictionary<string, string>();
+        }
+
+        public void Set (string key,string value)
     {
         dataItem.Add(key, value);
     }
@@ -63,6 +68,12 @@ public GWDataRow(Dictionary<string,string> i)
         {
             return dataItem;
         }
+
+        public bool has_column(string columnname)
+        {
+            return dataItem.ContainsKey(columnname);
+        }
+
 
         //KeyValuePair<string, string> entry in item)
         public List<KeyValuePair<string,string>> entrySet()
