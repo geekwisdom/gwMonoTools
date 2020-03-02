@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Odbc;
@@ -41,19 +42,20 @@ namespace org.geekwisdom
         private void initialize403()
         {
             fault403 = new GWDataTable("", "fault");
-            GWDataRow newrow = new GWDataRow();
-            newrow.Set("code", "Server");
-            newrow.Set("faultstring", "403 Access Denied");
+            //GWDataRow newrow = new GWDataRow();
+            Dictionary<String, String> newrow = new Dictionary<string, string>();
+            newrow.Add("code", "Server");
+            newrow.Add("faultstring", "403 Access Denied");
             fault403.Add(newrow);
         }
 
         private String showError(String faultstring, String detail, String format)
         {
             GWDataTable errormsg = new GWDataTable("", "fault");
-            GWDataRow newrow = new GWDataRow();
-            newrow.Set("code", "Server");
-            newrow.Set("faultstring", faultstring);
-            if (detail != "") newrow.Set("detail", detail);
+            Dictionary<String, String> newrow = new Dictionary<string, string>();
+            newrow.Add("code", "Server");
+            newrow.Add("faultstring", faultstring);
+            if (detail != "") newrow.Add("detail", detail);
             errormsg.Add(newrow);
             if (format.ToLower() == "xml") return errormsg.toXml();
             if (format.ToLower() == "json")
@@ -207,7 +209,8 @@ namespace org.geekwisdom
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e.StackTrace);
+                            
+                            Console.WriteLine(e.Message + Environment.NewLine + e.StackTrace);
                         }
                     }
                     else
@@ -235,9 +238,11 @@ namespace org.geekwisdom
                                     //       at 2 is optionally the size
                                     //OdbcType thetype = (OdbcType)Enum.Parse(typeof(OdbcType), datatype[1], true);
                                     //OdbcParameter ODBCParameter = new OdbcParameter("@" + entry.Key, thetype, Int32.Parse(datatype[2]));
-                                    OdbcParameter ODBCParameter = new OdbcParameter("@P" + i.ToString(), OdbcType.VarChar);
+                                     OdbcParameter ODBCParameter = new OdbcParameter("@P" + i.ToString(), OdbcType.VarChar);
                                     ODBCParameter.Value = entry.Value;
                                     cmd.Parameters.Add(ODBCParameter);
+                                    //cmd.Parameters.AddWithValue("@P" + i.ToString(), entry.Value);
+                                   
                                     i++;
                                 }
 
@@ -290,7 +295,7 @@ namespace org.geekwisdom
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e.Message +Environment.NewLine + e.StackTrace);
             }
             return null;
         }

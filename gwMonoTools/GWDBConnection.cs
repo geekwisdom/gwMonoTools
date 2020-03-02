@@ -69,16 +69,18 @@ namespace org.geekwisdom
             {
                 string driverfilter = driver;
                 if (driver == "oci") driverfilter = "oracle";
-                    string[] drivers = GetOdbcDriverNames(driverfilter);
-                if (drivers.Length > 0) drivername = GetOdbcDriverNames(driver)[0];
+                if (driver.IndexOf("oracle") >= 0 ) driverfilter = "oracle";
+                string[] drivers = GetOdbcDriverNames(driverfilter);
+                if (drivers.Length > 0) drivername = drivers[drivers.Length-1];
+                
                 
             }
 
             if (driver.ToLower() == "sqlsrv")
             {
                 if (drivername == "") drivername = "SQL Server";
-                if (port == "") finalconnectstring = "Driver={" + drivername + "};Server=" + host + ";Database=" + dbname + ";";
-                else finalconnectstring = "Driver={" + drivername + "}; Server=" + host + "," + port + ";Database=" + dbname + ";";
+                if (port == "") port = "1433";
+                finalconnectstring = "Driver={" + drivername + "}; Server=" + host + "," + port + ";Database=" + dbname + ";";
                 if (un == "") finalconnectstring = finalconnectstring + "Trusted_Connection=Yes;";
                 else finalconnectstring = finalconnectstring + "Uid=" + un + ";Pwd=" + pw + ";";
               }
@@ -92,14 +94,28 @@ namespace org.geekwisdom
                 finalconnectstring = finalconnectstring + "User=" + un + ";Password=" + pw + ";Option = 3;";
             }
 
-            if (driver.ToLower() == "oci")
+            if (driver.ToLower() == "oci" || driver.IndexOf("oracle") >= 0)
             {
                 //SERVER = (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = MyHost)(PORT = MyPort))(CONNECT_DATA = (SERVICE_NAME = MyOracleSID))); uid = myUsername; pwd = myPassword;
                 if (drivername == "") drivername = "Microsoft ODBC Driver for Oracle";
-                if (port == "") finalconnectstring = "Driver = {" + drivername + "};Server=" + host + ";Database=" + dbname + ";";
-                else finalconnectstring = "Driver = {" + drivername + "}; Server=" + host + "," + port + ";Database=" + dbname + ";";
-                finalconnectstring = finalconnectstring + "Uid = " + un + ";Pwd = " + pw + ";";
+                if (drivername.IndexOf ("Microsoft") >= 0)
+                {
+
+                    //finalconnectstring = "Driver={" + drivername + "};CONNECTSTRING=" + connectData;
+                    finalconnectstring = "Driver={" + drivername + "};Server=" + dbname + ";";
+                        finalconnectstring = finalconnectstring + "Uid=" + un + ";Pwd=" + pw + ";";
+                    
+                }
+                else
+                {
+                finalconnectstring = "Driver={" + drivername + "};Dbq="+ dbname + ";";
+                finalconnectstring = finalconnectstring + "Uid=" + un + ";Pwd=" + pw + ";";
+
             }
+
+        }
+                
+            
             /*
             if (driver.ToLower() == "oci")
             {
@@ -114,6 +130,8 @@ namespace org.geekwisdom
 
         public OdbcConnection getConnection()
         {
+            //            OdbcConnection conn = new OdbcConnection(finalconnectstring);
+            finalconnectstring = finalconnectstring.Substring(0, finalconnectstring.Length - 1);
             OdbcConnection conn = new OdbcConnection(finalconnectstring);
             conn.Open();
             return conn;
